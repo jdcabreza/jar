@@ -36,7 +36,30 @@ auto VIEWPORT_UPPER_LEFT = CAMERA_CENTER
                             - (VIEWPORT_V / 2);
 auto TOP_LEFT_PIXEL = VIEWPORT_UPPER_LEFT + 0.5 * (PIXEL_DELTA_U + PIXEL_DELTA_V);
 
+float hit_sphere(const Point3d& center, float radius, const Ray& r) {
+    Vector3d OC = r.origin() - center;
+
+    auto a = r.direction().length_squared();
+    auto half_b = dot(OC, r.direction());
+    auto c = OC.length_squared() - (radius * radius);
+
+    auto discriminant = (half_b * half_b) - (a * c);
+    
+    if (discriminant < 0) {
+        return -1.0;
+    }
+
+    return (-half_b - sqrt(discriminant)) / a;
+}
+
 Color get_ray_color(const Ray& r) {
+    float t = hit_sphere(Point3d(0, 0, -1), 0.5, r);
+
+    if (t > 0.0) {
+        Vector3d normal = unit_vector(r.at(t) - Vector3d(0, 0, -1));
+        return 0.5 * Color(normal.x() + 1, normal.y() + 1, normal.z() + 1);
+    }
+
     Vector3d ray_direction = unit_vector(r.direction());
 
     // Calculate our alpha for our linear interpolation
