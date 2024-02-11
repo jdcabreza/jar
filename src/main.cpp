@@ -1,3 +1,6 @@
+#include "color.h"
+#include "vector3d.h"
+
 #include <iostream>
 #include <format>
 
@@ -10,13 +13,19 @@ int main() {
     std::cout << ppm_header;
 
     for (int y = 0; y < IMAGE_HEIGHT; ++y) {
-        for (int x = 0; x < IMAGE_WIDTH; ++x) {
-            auto r = static_cast<int>(255.999 * (float(x) / (IMAGE_WIDTH - 1)));
-            auto g = static_cast<int>(255.999 * (float(y) / (IMAGE_HEIGHT - 1)));
+        const auto progress_log = std::format("\rINFO: Scanlines remaining: {} ", (IMAGE_HEIGHT - y));
+        std::clog << progress_log << std::flush;
 
-            std::cout << std::format("{} {} {}\n", r, g, BLUE_VALUE);
+        for (int x = 0; x < IMAGE_WIDTH; ++x) {
+            auto pixel_color = Color(
+                float(x) / (IMAGE_WIDTH - 1),
+                float(y) / (IMAGE_HEIGHT - 1),
+                0
+            );
+            write_color(std::cout, pixel_color);
         }
     }
 
+    std::clog << "\rINFO: Rendering done.";
     return 0;
 }
